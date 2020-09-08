@@ -9,6 +9,7 @@ stages:
     - test
     - deploy
 
+
 build:
     stage: build
     script:
@@ -16,3 +17,7 @@ build:
         - node --version
         - yarn --version
         - npm --version
+
+
+
+
