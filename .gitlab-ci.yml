@@ -4,10 +4,6 @@ default:
 workflow:
   rules: 
     - if: $CI_EXTERNAL_PULL_REQUEST_IID
-    
-    
-    
-    
 stages: 
     - build
     - test
@@ -16,6 +12,7 @@ stages:
 build:
     stage: build
     script:
+        - echo $CI_EXTERNAL_PULL_REQUEST_IID
         - node --version
         - yarn --version
         - npm --version
