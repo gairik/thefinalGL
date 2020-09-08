@@ -4,8 +4,6 @@ default:
 workflow:
   rules: 
     - if: $CI_EXTERNAL_PULL_REQUEST_IID
-    
-    
 stages: 
     - build
     - test
