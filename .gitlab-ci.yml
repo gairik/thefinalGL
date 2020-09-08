@@ -1,0 +1,18 @@
+default:
+    image: node
+    
+workflow:
+  rules: 
+    - if: $CI_EXTERNAL_PULL_REQUEST_IID
+    
+stages: 
+    - build
+    - test
+    - deploy
+
+build:
+    stage: build
+    script:
+        - node --version
+        - yarn --version
+        - npm --version
