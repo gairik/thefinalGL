@@ -26,7 +26,9 @@ build:
         echo CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME : $CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME
         echo CI_EXTERNAL_PULL_REQUEST_TARGET_BRANCH_NAME : $CI_EXTERNAL_PULL_REQUEST_TARGET_BRANCH_NAME
     # Check if feature branch exists in downstream project. Otherwise use master.
-    - export TRIGGER_BRANCH=${CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME}
+    - |
+        export TRIGGER_BRANCH=${CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME}
+        export TRIGGER_BRANCH=master
     - |
       curl -fksSL --header \
       "PRIVATE-TOKEN:${SVC_HLS_RENDER_API}" \
