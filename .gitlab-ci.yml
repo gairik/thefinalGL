@@ -9,13 +9,14 @@ stages:
     - build
     - test
     - deploy
-
+variables:
+    DOWNSTREAM_PROJECT_ID: 10048
+    
 build:
     stage: build
     image: alpine
     before_script:
     - apk add curl jq
-    - export DOWNSTREAM_PROJECT_ID=10048
     script:
     - |
     
