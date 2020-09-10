@@ -4,25 +4,55 @@ default:
 workflow:
   rules: 
     - if: $CI_EXTERNAL_PULL_REQUEST_IID
+    - if: '$CI_PIPELINE_SOURCE == "web"'
 stages: 
     - build
     - test
     - deploy
 
-
+variables:
+    DOWNSTREAM_PROJECT_ID: 10048
+    
 build:
     stage: build
-    script: |
-        
+    image: alpine
+    before_script:
+    - apk add curl jq
+    script:
+    - |
+    
         echo CI_EXTERNAL_PULL_REQUEST_IID: $CI_EXTERNAL_PULL_REQUEST_IID
         echo CI_EXTERNAL_PULL_REQUEST_SOURCE_REPOSITORY	: $CI_EXTERNAL_PULL_REQUEST_SOURCE_REPOSITORY	
         echo CI_EXTERNAL_PULL_REQUEST_TARGET_REPOSITORY : $CI_EXTERNAL_PULL_REQUEST_TARGET_REPOSITORY
         echo CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME : $CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME
         echo CI_EXTERNAL_PULL_REQUEST_TARGET_BRANCH_NAME : $CI_EXTERNAL_PULL_REQUEST_TARGET_BRANCH_NAME
-        
-        git status
-        git log
-        git checkout $CI_EXTERNAL_PULL_REQUEST_SOURCE_REPOSITORY
-        git status
-        node --version
+
+    # Check if feature branch exists in downstream project. Otherwise use master.
+    - |
+        export TRIGGER_BRANCH=${CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME}
+        export TRIGGER_BRANCH=master
+    - |
+      curl -fksSL --header \
+      "PRIVATE-TOKEN:${SVC_HLS_RENDER_API}" \
+      "${CI_SERVER_URL}/api/v4/projects/${DOWNSTREAM_PROJECT_ID}/repository/branches/${CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME}" \
+        || export TRIGGER_BRANCH='master'
+    - echo "Going to trigger pipeline on ${TRIGGER_BRANCH} branch in downstream project (id ${DOWNSTREAM_PROJECT_ID})"
+    # Trigger downstream project and wait for it. 
+    - |
+      resp=$(curl -fksSL --request POST --form "token=${CI_JOB_TOKEN}" --form "ref=${TRIGGER_BRANCH}" ${CI_SERVER_URL}/api/v4/projects/${DOWNSTREAM_PROJECT_ID}/trigger/pipeline)
+      id=$(echo $resp | jq -r '.id')
+      web_url=$(echo $resp | jq -r '.web_url')
+      echo "Waiting for pipeline $web_url ..."
+      # Wait 30 mins (10 seconds x 180 times)
+      for retry in $(seq 1 180); do
+        status=$(curl -s --header "PRIVATE-TOKEN:${SVC_HLS_RENDER_API}" "${CI_SERVER_URL}/api/v4/projects/${DOWNSTREAM_PROJECT_ID}/pipelines/$id" | jq -r '.status')
+        echo "Got pipeline status $status, retry $retry/180"
+        [[ $status == "success" || $status == "failed" ]] && break
+        sleep 10
+      done
+
+      if [[ $status != "success" ]]; then
+        echo "$web_url has status $status, failing"
+        exit 1
+      fi
         
