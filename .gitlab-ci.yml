@@ -5,6 +5,7 @@ workflow:
   rules: 
     - if: $CI_EXTERNAL_PULL_REQUEST_IID
     - if: '$CI_PIPELINE_SOURCE == "web"'
+    
 stages: 
     - build
     - test
