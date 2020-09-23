@@ -39,10 +39,15 @@ build:
         # "PRIVATE-TOKEN: $SVC_HLS_RENDER_API" \
         # "${CI_SERVER_URL}/api/v4/projects/$DOWNSTREAM_PROJECT_ID/merge_requests?source_branch=$CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME&target_branch=master&title=PullReqFrom_$CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME"
 
-trigger_downstream:
-  variables:
-    CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME: $CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME
+        echo $TRIGGER_BRANCH
+        ./generate-config.sh
+    artifacts:
+     paths:
+      - generated-config.yml
+
+bridge_for_bridge:
   stage: trigger_downstream
   trigger:
-    project: aluni/target
-    branch: downstreamjob
+    include:
+      - artifact: generated-config.yml
+        job: generated-config
