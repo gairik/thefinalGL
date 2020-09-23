@@ -50,4 +50,4 @@ bridge_for_bridge:
   trigger:
     include:
       - artifact: generated-config.yml
-        job: generated-config
+        job: build
