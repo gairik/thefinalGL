@@ -45,4 +45,4 @@ trigger_downstream:
   stage: trigger_downstream
   trigger:
     project: aluni/target
-    branch: $CI_EXTERNAL_PULL_REQUEST_SOURCE_BRANCH_NAME
+    branch: downstreamjob
