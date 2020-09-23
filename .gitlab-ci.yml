@@ -1,17 +1,14 @@
-default:
-    image: node
 stages:
     - build
     - trigger_downstream
+default:
+    image: node
 
 workflow:
   rules:
     - if: $CI_EXTERNAL_PULL_REQUEST_IID
     - if: '$CI_PIPELINE_SOURCE == "web"'
-stages:
-    - build
-    - test
-    - deploy
+
 variables:
     DOWNSTREAM_PROJECT_ID: 10048
 
