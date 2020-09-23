@@ -52,3 +52,4 @@ bridge_for_bridge:
     include:
       - artifact: generated-config.yml
         job: build
+    strategy: depend
