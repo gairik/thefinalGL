@@ -41,7 +41,7 @@ build:
 
         echo $TRIGGER_BRANCH
         ./generate-config.sh
-        echo "testing status"
+        echo "testing stat us"
     artifacts:
      paths:
       - generated-config.yml
