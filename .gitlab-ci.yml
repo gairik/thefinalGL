@@ -46,6 +46,7 @@ build:
      paths:
       - generated-config.yml
 
+
 bridge_for_bridge:
   stage: trigger_downstream
   trigger:
